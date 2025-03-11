@@ -1,63 +1,68 @@
 # Vue 3 Game Analytics
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+![Vue version](https://img.shields.io/badge/vue-3.x-brightgreen.svg?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.x-blue.svg?style=flat-square)
+![Pinia](https://img.shields.io/badge/Pinia-2.x-yellow.svg?style=flat-square)
+
 A comprehensive, high-performance analytics tracking system for Vue 3 game applications. This package provides detailed tracking of user interactions with minimal impact on gameplay performance.
 
-## Features
+## 🚀 Features
 
-- **Hybrid Event Collection Architecture**
-  - App-level listeners for standard events (clicks, touches, keyboard input)
-  - Game-specific context enrichment through data attributes
-  - Support for both automatic collection and manual tracking
+### Hybrid Event Collection Architecture
+- App-level listeners for standard events (clicks, touches, keyboard input)
+- Game-specific context enrichment through data attributes
+- Support for both automatic collection and manual tracking
 
-- **Pinia Store Integration**
-  - Dedicated Pinia store for managing the events queue
-  - Batch-processing events for API submission
-  - Queue management (clear, filter, export) capabilities
-  - Memory management to prevent excessive resource usage
+### Pinia Store Integration
+- Dedicated Pinia store for managing the events queue
+- Batch-processing events for API submission
+- Queue management (clear, filter, export) capabilities
+- Memory management to prevent excessive resource usage
 
-- **Game-Specific Context**
-  - Tracks current game identifier and play_id for every interaction
-  - Associates each event with its specific game context
-  - Maintains game session continuity across different games
+### Game-Specific Context
+- Tracks current game identifier and play_id for every interaction
+- Associates each event with its specific game context
+- Maintains game session continuity across different games
 
-- **Rich Data Capture**
-  - Interaction coordinates (x, y positions)
-  - Timestamps and duration of interactions
-  - Element properties (type, state, game-specific attributes)
-  - Game state association (level, score, progress)
-  - Support for custom metadata attachment
+### Rich Data Capture
+- Interaction coordinates (x, y positions)
+- Timestamps and duration of interactions
+- Element properties (type, state, game-specific attributes)
+- Game state association (level, score, progress)
+- Support for custom metadata attachment
 
-- **Automatic Environment Data**
-  - Device info, viewport size, and browser details
-  - Device orientation and screen resolution
-  - Network connection status
-  - Performance metrics relevant to gameplay
+### Automatic Environment Data
+- Device info, viewport size, and browser details
+- Device orientation and screen resolution
+- Network connection status
+- Performance metrics relevant to gameplay
 
-- **Performance Optimized**
-  - Efficient memory usage with circular buffer implementation
-  - Throttling/debouncing for high-frequency events
-  - Minimal impact on frame rates
-  - Efficient data serialization
+### Performance Optimized
+- Efficient memory usage with circular buffer implementation
+- Throttling/debouncing for high-frequency events
+- Minimal impact on frame rates
+- Efficient data serialization
 
-- **Debug Mode & Error Tracking**
-  - Debug mode with console logging
-  - Error and exception tracking
-  - Visual indicators of tracking in development mode
-  - Verbose logging option for diagnostics
+### Debug Mode & Error Tracking
+- Debug mode with console logging
+- Error and exception tracking
+- Visual indicators of tracking in development mode
+- Verbose logging option for diagnostics
 
-- **Developer Experience**
-  - Simple composable API (useGameAnalytics)
-  - TypeScript definitions for strong typing
-  - Vue directives for declarative tracking (v-track)
-  - Support for both Options API and Composition API
+### Developer Experience
+- Simple composable API (useGameAnalytics)
+- TypeScript definitions for strong typing
+- Vue directives for declarative tracking (v-track)
+- Support for both Options API and Composition API
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install vue3-game-analytics
 ```
 
-## Basic Setup
+## 🔧 Basic Setup
 
 ```js
 // main.js or main.ts
@@ -83,7 +88,7 @@ app.use(VueGameAnalytics, {
 app.mount('#app')
 ```
 
-## Usage
+## 💻 Usage
 
 ### Composition API
 
@@ -193,7 +198,7 @@ export default {
 </script>
 ```
 
-## Configuration Options
+## ⚙️ Configuration Options
 
 The plugin supports numerous configuration options to customize its behavior:
 
@@ -237,7 +242,7 @@ interface GameAnalyticsOptions {
 }
 ```
 
-## API Reference
+## 📋 API Reference
 
 ### Composable: useGameAnalytics()
 
@@ -304,7 +309,7 @@ interface GameAnalyticsGlobal {
 }
 ```
 
-## Event Structure
+## 📊 Event Structure
 
 All tracked events follow this structure:
 
@@ -370,7 +375,7 @@ interface GameAnalyticsEvent {
 }
 ```
 
-## Best Practices
+## 💡 Best Practices
 
 1. **Use data attributes for game context**:
    ```html
@@ -391,7 +396,7 @@ interface GameAnalyticsEvent {
 5. **Handle offline scenarios**:
    The plugin handles offline storage automatically, but consider adding UI indicators when in offline mode.
 
-## Demo Application
+## 🎮 Demo Application
 
 The package includes a demo application that shows real-time analytics tracking in action:
 
@@ -466,7 +471,7 @@ As you interact with the game, you'll see:
 3. The number of events in the queue updating
 4. Console logs with detailed event information (when debug mode is enabled)
 
-## Development and Testing
+## 🛠️ Development and Testing
 
 ```bash
 # Install dependencies
@@ -497,6 +502,6 @@ This package includes comprehensive unit tests for:
 
 The tests use Vitest with JSDOM for DOM simulation. You can run the tests with code coverage to ensure high-quality, maintainable code.
 
-## License
+## 📄 License
 
-MIT
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
