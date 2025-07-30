@@ -1,6 +1,6 @@
 {
   "name": "vue3-game-analytics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Comprehensive analytics tracking system for Vue 3 game applications",
   "type": "module",
   "files": [

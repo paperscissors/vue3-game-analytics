@@ -32,52 +32,168 @@ export const GameAnalyticsPlugin: Plugin = {
       app.use(pinia);
     }
     
-    // Initialize the store
-    const store = useAnalyticsStore();
-    store.initialize(options);
+    // Store options for deferred initialization
+    app.config.globalProperties._gameAnalyticsOptions = options;
+    app.config.globalProperties._eventQueue = [];
+    app.config.globalProperties._analyticsReady = false;
     
-    // Set up event handlers for automatic tracking
-    const removeEventHandlers = setupEventHandlers(options);
-    
-    // Set up network status monitoring
-    const removeNetworkMonitoring = monitorNetworkStatus(status => {
-      store.updateNetworkStatus(status);
-    });
-    
-    // Set up performance monitoring if enabled
-    let getFps: (() => number) | undefined;
+    // Store cleanup function references
+    let removeEventHandlers: (() => void) | undefined;
+    let removeNetworkMonitoring: (() => void) | undefined;
     let performanceMonitoringInterval: ReturnType<typeof setInterval> | undefined;
     
-    if (options.trackPerformance) {
-      getFps = createFpsMonitor();
+    // Override mount method for deferred initialization
+    const originalMount = app.mount;
+    app.mount = function(container: any) {
+      const result = originalMount.call(this, container);
       
-      // Report performance metrics every 30 seconds
-      performanceMonitoringInterval = setInterval(() => {
-        const fps = getFps ? getFps() : 0;
+      // NOW initialize the store after mount
+      try {
+        const store = useAnalyticsStore();
+        store.initialize(options);
         
-        store.trackEvent({
-          type: 'performance',
-          metadata: {
-            fps,
-            // @ts-ignore: Non-standard property
-            memoryUsage: window.performance && window.performance.memory ? 
-              // @ts-ignore: Non-standard property
-              Math.round(window.performance.memory.usedJSHeapSize / (1024 * 1024)) : 
-              undefined
-          }
+        // Set up event handlers for automatic tracking
+        removeEventHandlers = setupEventHandlers(options);
+        
+        // Set up network status monitoring
+        removeNetworkMonitoring = monitorNetworkStatus(status => {
+          store.updateNetworkStatus(status);
         });
-      }, 30000);
-    }
+        
+        // Set up performance monitoring if enabled
+        let getFps: (() => number) | undefined;
+        
+        if (options.trackPerformance) {
+          getFps = createFpsMonitor();
+          
+          // Report performance metrics every 30 seconds
+          performanceMonitoringInterval = setInterval(() => {
+            const fps = getFps ? getFps() : 0;
+            
+            store.trackEvent({
+              type: 'performance',
+              metadata: {
+                fps,
+                // @ts-expect-error: Non-standard property
+                memoryUsage: window.performance && window.performance.memory ? 
+                  // @ts-expect-error: Non-standard property
+                  Math.round(window.performance.memory.usedJSHeapSize / (1024 * 1024)) : 
+                  undefined
+              }
+            });
+          }, 30000);
+        }
+        
+        // Apply consent setting if it was set before initialization
+        if (app.config.globalProperties._consentSetting !== undefined) {
+          store.setConsent(app.config.globalProperties._consentSetting);
+          delete app.config.globalProperties._consentSetting;
+        }
+        
+        // Process queued events
+        const eventQueue = app.config.globalProperties._eventQueue;
+        if (eventQueue && eventQueue.length > 0) {
+          eventQueue.forEach((event: any) => {
+            store.trackEvent(event);
+          });
+          // Clear the queue
+          app.config.globalProperties._eventQueue = [];
+        }
+        
+        // Mark analytics as ready
+        app.config.globalProperties._analyticsReady = true;
+        
+      } catch (error) {
+        console.error('[GameAnalytics] Failed to initialize analytics store:', error);
+        // Mark as ready even on error to prevent infinite queueing
+        app.config.globalProperties._analyticsReady = true;
+      }
+      
+      return result;
+    };
     
-    // Make analytics available globally
+    // Make analytics available globally with queueing support
     app.config.globalProperties.$gameAnalytics = {
-      trackEvent: (event: any) => store.trackEvent(event),
-      flushEvents: () => store.flushEvents(),
-      enableDebug: () => store.setDebugMode(true),
-      disableDebug: () => store.setDebugMode(false),
-      clearEvents: () => store.clearEvents(),
-      getEventCount: () => store.eventCount,
-      setConsent: (hasConsent: boolean) => store.setConsent(hasConsent)
+      trackEvent: (event: any) => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.trackEvent(event);
+          } catch (error) {
+            console.error('[GameAnalytics] Error tracking event:', error);
+          }
+        } else {
+          // Queue the event for later processing
+          app.config.globalProperties._eventQueue.push(event);
+        }
+      },
+      flushEvents: () => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.flushEvents();
+          } catch (error) {
+            console.error('[GameAnalytics] Error flushing events:', error);
+          }
+        }
+      },
+      enableDebug: () => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.setDebugMode(true);
+          } catch (error) {
+            console.error('[GameAnalytics] Error enabling debug mode:', error);
+          }
+        }
+      },
+      disableDebug: () => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.setDebugMode(false);
+          } catch (error) {
+            console.error('[GameAnalytics] Error disabling debug mode:', error);
+          }
+        }
+      },
+      clearEvents: () => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.clearEvents();
+          } catch (error) {
+            console.error('[GameAnalytics] Error clearing events:', error);
+          }
+        }
+        // Also clear the queue if not ready yet
+        app.config.globalProperties._eventQueue = [];
+      },
+      getEventCount: () => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            return store.eventCount;
+          } catch (error) {
+            console.error('[GameAnalytics] Error getting event count:', error);
+            return 0;
+          }
+        }
+        return app.config.globalProperties._eventQueue.length;
+      },
+      setConsent: (hasConsent: boolean) => {
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.setConsent(hasConsent);
+          } catch (error) {
+            console.error('[GameAnalytics] Error setting consent:', error);
+          }
+        } else {
+          // Store consent setting for later application
+          app.config.globalProperties._consentSetting = hasConsent;
+        }
+      }
     };
     
     // Store original unmount method
@@ -85,15 +201,31 @@ export const GameAnalyticsPlugin: Plugin = {
     
     // Override unmount to clean up resources
     app.unmount = function() {
-      removeEventHandlers();
-      removeNetworkMonitoring();
-      
-      if (performanceMonitoringInterval) {
-        clearInterval(performanceMonitoringInterval);
+      try {
+        if (removeEventHandlers) {
+          removeEventHandlers();
+        }
+        
+        if (removeNetworkMonitoring) {
+          removeNetworkMonitoring();
+        }
+        
+        if (performanceMonitoringInterval) {
+          clearInterval(performanceMonitoringInterval);
+        }
+        
+        // Flush any remaining events before unmounting
+        if (app.config.globalProperties._analyticsReady) {
+          try {
+            const store = useAnalyticsStore();
+            store.flushEvents();
+          } catch (error) {
+            console.error('[GameAnalytics] Error flushing events during unmount:', error);
+          }
+        }
+      } catch (error) {
+        console.error('[GameAnalytics] Error during cleanup:', error);
       }
-      
-      // Flush any remaining events before unmounting
-      store.flushEvents();
       
       // Call original unmount method
       originalUnmount.call(this);
