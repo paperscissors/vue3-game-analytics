@@ -2,7 +2,6 @@ import { App, Plugin } from 'vue';
 import { GameAnalyticsOptions } from './types';
 import { GameAnalyticsPlugin } from './core/plugin';
 import { registerDirectives } from './directives';
-import { generateUUID } from './utils';
 
 // Export types
 export * from './types';

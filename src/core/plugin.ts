@@ -1,5 +1,4 @@
 import { App, Plugin } from 'vue';
-import { createPinia } from 'pinia';
 import { GameAnalyticsOptions } from '../types';
 import { useAnalyticsStore } from '../store/analytics-store';
 import { setupEventHandlers } from './event-handlers';
@@ -26,11 +25,7 @@ export const GameAnalyticsPlugin: Plugin = {
       options.playId = generateUUID();
     }
     
-    // Install Pinia if not already installed
-    if (!app.config.globalProperties.$pinia) {
-      const pinia = createPinia();
-      app.use(pinia);
-    }
+    // No need to install Pinia - using custom store
     
     // Store options for deferred initialization
     app.config.globalProperties._gameAnalyticsOptions = options;

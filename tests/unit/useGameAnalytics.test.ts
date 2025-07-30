@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
 import { useGameAnalytics } from '../../src/composables/useGameAnalytics';
 import { useAnalyticsStore } from '../../src/store/analytics-store';
 import { ref } from 'vue';
@@ -28,9 +27,6 @@ vi.mock('../../src/store/analytics-store', () => {
 
 describe('useGameAnalytics', () => {
   beforeEach(() => {
-    // Create a fresh pinia instance and set it as active
-    setActivePinia(createPinia());
-    
     // Reset mock call history
     vi.mocked(useAnalyticsStore().trackEvent).mockClear();
     vi.mocked(useAnalyticsStore().flushEvents).mockClear();

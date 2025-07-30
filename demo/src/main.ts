@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
 import App from './App.vue';
 import VueGameAnalytics from '../../src'; // Use local package
 import { generateUUID } from '../../src/utils';
@@ -7,9 +6,7 @@ import { generateUUID } from '../../src/utils';
 // Create app
 const app = createApp(App);
 
-// Create and use Pinia
-const pinia = createPinia();
-app.use(pinia);
+// No need for Pinia anymore - using custom store
 
 // Set up analytics with a mock API endpoint
 app.use(VueGameAnalytics, {

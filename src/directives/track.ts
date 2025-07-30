@@ -20,7 +20,7 @@ export function createTrackDirective(): Directive {
   const store = useAnalyticsStore();
   
   // Cached throttled handlers
-  const throttledHandlers = new WeakMap<HTMLElement, Record<string, Function>>();
+  const throttledHandlers = new WeakMap<HTMLElement, Record<string, (...args: any[]) => any>>();
   
   /**
    * Helper to track an event
@@ -67,7 +67,7 @@ export function createTrackDirective(): Directive {
   /**
    * Gets or creates a throttled handler for an element and event
    */
-  const getThrottledHandler = (el: HTMLElement, event: string, binding: DirectiveBinding<TrackValue>, handler: Function): Function => {
+  const getThrottledHandler = (el: HTMLElement, event: string, binding: DirectiveBinding<TrackValue>, handler: (...args: any[]) => any): (...args: any[]) => any => {
     const throttleTime = binding.value?.throttle || 300;
     
     // Get the cache for this element
@@ -119,7 +119,7 @@ export function createTrackDirective(): Directive {
       const events = binding.arg ? [binding.arg] : ['click'];
       
       // Add new event listeners
-      const handlers: Record<string, Function> = {};
+      const handlers: Record<string, (...args: any[]) => any> = {};
       events.forEach(eventName => {
         const handler = (event: Event) => trackEvent(el, event, binding);
         const throttledHandler = getThrottledHandler(el, eventName, binding, handler);
@@ -178,6 +178,6 @@ function getElementIdentifier(element: HTMLElement): string {
 // Add type for element with track handlers
 declare global {
   interface HTMLElement {
-    _trackHandlers?: Record<string, Function>;
+    _trackHandlers?: Record<string, (...args: any[]) => any>;
   }
 }
