@@ -3,9 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 ![Vue version](https://img.shields.io/badge/vue-3.x-brightgreen.svg?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.x-blue.svg?style=flat-square)
-![Pinia](https://img.shields.io/badge/Pinia-2.x-yellow.svg?style=flat-square)
 
-A comprehensive, high-performance analytics tracking system for Vue 3 game applications. This package provides detailed tracking of user interactions with minimal impact on gameplay performance.
+A lightweight, high-performance analytics tracking system for Vue 3 game applications. This package provides detailed tracking of user interactions with minimal dependencies and impact on gameplay performance.
 
 ## 🚀 Features
 
@@ -14,8 +13,8 @@ A comprehensive, high-performance analytics tracking system for Vue 3 game appli
 - Game-specific context enrichment through data attributes
 - Support for both automatic collection and manual tracking
 
-### Pinia Store Integration
-- Dedicated Pinia store for managing the events queue
+### Lightweight Reactive Store
+- Custom reactive store for managing the events queue (no external dependencies)
 - Batch-processing events for API submission
 - Queue management (clear, filter, export) capabilities
 - Memory management to prevent excessive resource usage
@@ -55,6 +54,7 @@ A comprehensive, high-performance analytics tracking system for Vue 3 game appli
 - TypeScript definitions for strong typing
 - Vue directives for declarative tracking (v-track)
 - Support for both Options API and Composition API
+- Zero external dependencies (no Pinia required)
 
 ## 📦 Installation
 
@@ -67,15 +67,12 @@ npm install vue3-game-analytics
 ```js
 // main.js or main.ts
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 import App from './App.vue'
 import VueGameAnalytics from 'vue3-game-analytics'
 import { generateUUID } from 'vue3-game-analytics'
 
 const app = createApp(App)
-const pinia = createPinia()
 
-app.use(pinia)
 app.use(VueGameAnalytics, {
   apiEndpoint: '/api/analytics',
   gameId: 'memory-match',
@@ -501,6 +498,25 @@ This package includes comprehensive unit tests for:
 - **Directives** - The v-track directive for declarative event tracking
 
 The tests use Vitest with JSDOM for DOM simulation. You can run the tests with code coverage to ensure high-quality, maintainable code.
+
+## 🔄 Migration from Previous Versions
+
+### Removal of Pinia Dependency
+
+Starting from version 0.2.0, this package no longer requires Pinia as a dependency. The analytics store is now implemented using Vue's native reactive system, making the package lighter and more portable while maintaining the same API.
+
+**What this means for you:**
+- No need to install or configure Pinia
+- Smaller bundle size
+- Fewer potential version conflicts
+- Same familiar API - all composables and methods work exactly as before
+
+**If you're upgrading from a previous version:**
+1. Remove Pinia installation from your setup code
+2. Remove the `createPinia()` and `app.use(pinia)` calls
+3. Everything else remains the same!
+
+The change is completely backward compatible in terms of functionality - only the setup process has been simplified.
 
 ## 📄 License
 
